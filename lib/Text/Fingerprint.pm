@@ -41,6 +41,7 @@ our %EXPORT_TAGS    = (all => [qw(fingerprint fingerprint_ngram)]);
 our @EXPORT_OK      = (@{$EXPORT_TAGS{all}});
 our @EXPORT         = qw();
 
+use List::MoreUtils qw(distinct);
 use Text::Unidecode;
 
 # VERSION
@@ -62,23 +63,22 @@ The process that generates the key from a C<$string> value is the following (not
 sub fingerprint {
     my ($string) = @_;
 
+    $string =~ s{
+        ^\s+ |
+        \s+$
+    }{}gsx;
+
     return join q( ) =>
+        distinct
         sort
-        keys {
-            map {
-                $_ => 1
-            } split
-                m{[
-                    \p{XPerlSpace} |
-                    \p{XPosixCntrl} |
-                    \p{XPosixPunct}
-                ]+}x =>
-                    lc unidecode
-                    $string =~ s{
-                        ^\s+ |
-                        \s+$
-                    }{}grsx
-        };
+        split
+            m{[
+                \p{XPerlSpace} |
+                \p{XPosixCntrl} |
+                \p{XPosixPunct}
+            ]+}x =>
+                lc unidecode
+                $string;
 }
 
 =func fingerprint_ngram($string, $n)
@@ -96,27 +96,27 @@ The L<n-gram|http://en.wikipedia.org/wiki/N-gram> fingerprint method is similar 
 =cut
 
 sub fingerprint_ngram {
-    my ($string, $n) = @_;
-    $n //= 2;
+    my ($string, $n) = (@_, 2);
+
+    $string =~ s{
+        \p{XPerlSpace} |
+        \p{XPosixCntrl} |
+        \p{XPosixPunct}
+    }{}gsx;
 
     return join q() =>
+        distinct
         sort
-        keys {
-            map {
-                $_ => 1
-            } (
-                lc unidecode
-                $string =~ s{
-                    \p{XPerlSpace} |
-                    \p{XPosixCntrl} |
-                    \p{XPosixPunct}
-                }{}grsx
-            ) =~ m{
-                (?=
-                    (.{$n})
-                )
-            }gx
-        };
+            (
+                (
+                    lc unidecode
+                    $string
+                ) =~ m{
+                    (?=
+                        (.{$n})
+                    )
+                }gx
+            );
 }
 
 =head1 SEE ALSO
