@@ -1,3 +1,4 @@
+#!perl
 use strict;
 use utf8;
 use warnings qw(all);
@@ -8,4 +9,4 @@ BEGIN {
     use_ok(q(Text::Fingerprint));
 };
 
-diag(qq(Testing Text::Fingerprint v$Text::Fingerprint::VERSION, Perl $], $^X));
+diag(qq(Text::Fingerprint v$Text::Fingerprint::VERSION, Perl $], $^X));
