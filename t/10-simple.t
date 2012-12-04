@@ -3,9 +3,8 @@ use strict;
 use utf8;
 use warnings qw(all);
 
+use Text::Fingerprint qw(:all);
 use Test::More;
-
-use_ok(q(Text::Fingerprint), qw(:all));
 
 my $str = q(
     À noite, vovô Kowalsky vê o ímã cair no pé do pingüim
@@ -13,7 +12,7 @@ my $str = q(
 );
 
 is(
-    fingerprint($str),
+    fingerprint $str,
 
     q(a acucar cair cha de do e feliz ima jabuti kowalsky) .
     q( no noite o pe pinguim poe queixoso tamaras ve vovo),
@@ -22,7 +21,7 @@ is(
 );
 
 is(
-    fingerprint_ngram($str),
+    (fingerprint_ngram $str),
 
     q(abacadaialamanarasbucachcudedoeaedeieleoetevfeg) .
     q(uhaifiminiritixizjakokylilsmamqngnoocoeoiojokop) .
@@ -39,4 +38,12 @@ is(
     q(fingerprint_ngram(..., 1))
 );
 
-done_testing(4);
+my $proto = fingerprint_ngram $str, 3;
+is(length $proto, 252, q(trigram));
+is(
+    $proto,
+    fingerprint_ngram($str, 3),
+    q(prototype),
+);
+
+done_testing 5;

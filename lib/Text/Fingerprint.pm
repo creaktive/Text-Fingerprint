@@ -63,7 +63,7 @@ The process that generates the key from a C<$string> value is the following (not
 
 =cut
 
-sub fingerprint {
+sub fingerprint ($) {
     my ($string) = @_;
 
     $string =~ s{
@@ -100,7 +100,7 @@ The L<n-gram|http://en.wikipedia.org/wiki/N-gram> fingerprint method is similar 
 
 =cut
 
-sub fingerprint_ngram {
+sub fingerprint_ngram ($;$) {
     my ($string, $n) = (@_, 2);
 
     $string =~ s{
