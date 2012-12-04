@@ -3,8 +3,8 @@ package Text::Fingerprint;
 
 =head1 SYNOPSIS
 
-    use feature qw(say);
-    use utf8;
+    #!/usr/bin/env perl
+    use common::sense;
 
     use Text::Fingerprint qw(:all);
 
@@ -21,6 +21,9 @@ package Text::Fingerprint;
     # abacadaialamanarasbucachcudedoeaedeieleoetevfeg
     # uhaifiminiritixizjakokylilsmamqngnoocoeoiojokop
     # osovowpepipoqurarnsdsksotatetiucueuiutvevowaxoyv
+
+    say fingerprint_ngram($str, 1);
+    # abcdefghijklmnopqrstuvwxyz
 
 =head1 DESCRIPTION
 
@@ -41,7 +44,7 @@ our %EXPORT_TAGS    = (all => [qw(fingerprint fingerprint_ngram)]);
 our @EXPORT_OK      = (@{$EXPORT_TAGS{all}});
 our @EXPORT         = qw();
 
-use List::MoreUtils qw(distinct);
+use List::MoreUtils qw(uniq);
 use Text::Unidecode;
 
 # VERSION
@@ -69,16 +72,18 @@ sub fingerprint {
     }{}gsx;
 
     return join q( ) =>
-        distinct
-        sort
-        split
-            m{[
-                \p{XPerlSpace} |
-                \p{XPosixCntrl} |
-                \p{XPosixPunct}
-            ]+}x =>
-                lc unidecode
-                $string;
+        sort(
+            uniq(
+                split(
+                    m{[
+                        \p{XPerlSpace} |
+                        \p{XPosixCntrl} |
+                        \p{XPosixPunct}
+                    ]+}x,
+                    lc(unidecode($string))
+                )
+            )
+        );
 }
 
 =func fingerprint_ngram($string, $n)
@@ -105,18 +110,15 @@ sub fingerprint_ngram {
     }{}gsx;
 
     return join q() =>
-        distinct
-        sort
-            (
-                (
-                    lc unidecode
-                    $string
-                ) =~ m{
+        sort(
+            uniq(
+                lc(unidecode($string)) =~ m{
                     (?=
                         (.{$n})
                     )
                 }gx
-            );
+            )
+        );
 }
 
 =head1 SEE ALSO

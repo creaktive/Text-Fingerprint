@@ -12,8 +12,8 @@ version 0.002
 
 =head1 SYNOPSIS
 
-    use feature qw(say);
-    use utf8;
+    #!/usr/bin/env perl
+    use common::sense;
 
     use Text::Fingerprint qw(:all);
 
@@ -30,6 +30,9 @@ version 0.002
     # abacadaialamanarasbucachcudedoeaedeieleoetevfeg
     # uhaifiminiritixizjakokylilsmamqngnoocoeoiojokop
     # osovowpepipoqurarnsdsksotatetiucueuiutvevowaxoyv
+
+    say fingerprint_ngram($str, 1);
+    # abcdefghijklmnopqrstuvwxyz
 
 =head1 DESCRIPTION
 
