@@ -1,7 +1,8 @@
 #!/usr/bin/env perl
 use autodie;
-use open qw(:locale);
+use open OUT => q(:locale);
 use strict;
+use utf8;
 use warnings qw(all);
 
 use Text::Fingerprint qw(fingerprint_ngram);

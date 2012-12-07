@@ -6,10 +6,10 @@ use warnings qw(all);
 use Text::Fingerprint qw(:all);
 use Test::More;
 
-my $str = q(
+my $str = << 'SAMPLE_TEXT';
     À noite, vovô Kowalsky vê o ímã cair no pé do pingüim
     queixoso e vovó põe açúcar no chá de tâmaras do jabuti feliz.
-);
+SAMPLE_TEXT
 
 is(
     fingerprint $str,

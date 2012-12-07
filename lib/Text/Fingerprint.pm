@@ -79,10 +79,7 @@ my $NON_WORD = ($^V < 5.013007)
 sub fingerprint ($) {
     my ($string) = @_;
 
-    $string =~ s{
-        ^\s+ |
-        \s+$
-    }{}gsx;
+    $string =~ s{^ $NON_WORD | $NON_WORD $}{}gosx;
 
     return join q( ) =>
         sort(
