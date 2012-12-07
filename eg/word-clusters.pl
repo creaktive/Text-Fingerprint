@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
 use autodie;
+use open qw(:locale);
 use strict;
 use warnings qw(all);
 
