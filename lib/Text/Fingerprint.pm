@@ -63,6 +63,19 @@ The process that generates the key from a C<$string> value is the following (not
 
 =cut
 
+# Unicode variants available since http://www.nntp.perl.org/group/perl.perl5.changes/2010/10/msg27957.html
+my $NON_WORD = ($^V < 5.013007)
+    ? q([
+        \p{SpacePerl} |
+        \p{PosixCntrl} |
+        \p{PosixPunct}
+    ]+)
+    : q([
+        \p{XPerlSpace} |
+        \p{XPosixCntrl} |
+        \p{XPosixPunct}
+    ]+);
+
 sub fingerprint ($) {
     my ($string) = @_;
 
@@ -75,11 +88,7 @@ sub fingerprint ($) {
         sort(
             uniq(
                 split(
-                    m{[
-                        \p{XPerlSpace} |
-                        \p{XPosixCntrl} |
-                        \p{XPosixPunct}
-                    ]+}x,
+                    m{${NON_WORD}}ox,
                     lc(unidecode($string))
                 )
             )
@@ -103,11 +112,7 @@ The L<n-gram|http://en.wikipedia.org/wiki/N-gram> fingerprint method is similar 
 sub fingerprint_ngram ($;$) {
     my ($string, $n) = (@_, 2);
 
-    $string =~ s{
-        \p{XPerlSpace} |
-        \p{XPosixCntrl} |
-        \p{XPosixPunct}
-    }{}gsx;
+    $string =~ s{${NON_WORD}}{}gosx;
 
     return join q() =>
         sort(
