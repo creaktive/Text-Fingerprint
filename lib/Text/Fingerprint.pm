@@ -57,24 +57,13 @@ The process that generates the key from a C<$string> value is the following (not
 * remove leading and trailing whitespace
 * normalize extended western characters to their ASCII representation (for example "gödel" → "godel")
 * change all characters to their lowercase representation
-* split the string into punctuation, whitespace and control characters-separated tokens
+* split the string into punctuation, whitespace and control characters-separated tokens (using C</[\W_]/> regexp)
 * sort the tokens and remove duplicates
 * join the tokens back together
 
 =cut
 
-# Unicode variants available since http://www.nntp.perl.org/group/perl.perl5.changes/2010/10/msg27957.html
-my $NON_WORD = ($^V < 5.013007)
-    ? q([
-        \p{SpacePerl} |
-        \p{PosixCntrl} |
-        \p{PosixPunct}
-    ]+)
-    : q([
-        \p{XPerlSpace} |
-        \p{XPosixCntrl} |
-        \p{XPosixPunct}
-    ]+);
+my $NON_WORD = qr{ [\W_]+ }x;
 
 sub fingerprint ($) {
     my ($string) = @_;
@@ -85,7 +74,7 @@ sub fingerprint ($) {
         sort(
             uniq(
                 split(
-                    m{${NON_WORD}}ox,
+                    m{ $NON_WORD }ox,
                     lc(unidecode($string))
                 )
             )
@@ -95,11 +84,12 @@ sub fingerprint ($) {
 =func fingerprint_ngram($string, $n)
 
 The L<n-gram|http://en.wikipedia.org/wiki/N-gram> fingerprint method is similar to the C<fingerprint> method described above but instead of using whitespace separated tokens, it uses I<n-grams>, where the C<$n> (or the size in chars of the token) can be specified by the user (default: 2).
+Algorithm steps:
 
 =for :list
-* change all characters to their lowercase representation
-* remove all punctuation, whitespace, and control characters
+* remove all punctuation, whitespace, and control characters (using C</[\W_]/> regexp)
 * normalize extended western characters to their ASCII representation
+* change all characters to their lowercase representation
 * obtain all the string n-grams
 * sort the n-grams and remove duplicates
 * join the sorted n-grams back together
@@ -109,9 +99,9 @@ The L<n-gram|http://en.wikipedia.org/wiki/N-gram> fingerprint method is similar 
 sub fingerprint_ngram ($;$) {
     my ($string, $n) = (@_, 2);
 
-    $string =~ s{${NON_WORD}}{}gosx;
+    $string =~ s{ $NON_WORD }{}gosx;
 
-    return join q() =>
+    return join '' =>
         sort(
             uniq(
                 lc(unidecode($string)) =~ m{
@@ -122,6 +112,11 @@ sub fingerprint_ngram ($;$) {
             )
         );
 }
+
+=head1 CAVEAT
+
+Fingerprint functions I<are not exactly the same> as those found in Google Refine!
+They were slightly changed to take advantage of the superb Perl handling of Unicode characters.
 
 =head1 SEE ALSO
 
