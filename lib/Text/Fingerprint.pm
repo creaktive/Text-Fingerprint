@@ -54,9 +54,9 @@ use Text::Unidecode;
 The process that generates the key from a C<$string> value is the following (note that the order of these operations is significant):
 
 =for :list
-* remove leading and trailing whitespace
 * normalize extended western characters to their ASCII representation (for example "gödel" → "godel")
 * change all characters to their lowercase representation
+* remove leading and trailing whitespace
 * split the string into punctuation, whitespace and control characters-separated tokens (using C</[\W_]/> regexp)
 * sort the tokens and remove duplicates
 * join the tokens back together
@@ -68,6 +68,7 @@ my $NON_WORD = qr{ [\W_]+ }x;
 sub fingerprint ($) {
     my ($string) = @_;
 
+    $string = lc unidecode $string;
     $string =~ s{^ $NON_WORD | $NON_WORD $}{}gosx;
 
     return join q( ) =>
@@ -75,7 +76,7 @@ sub fingerprint ($) {
             uniq(
                 split(
                     m{ $NON_WORD }ox,
-                    lc(unidecode($string))
+                    $string
                 )
             )
         );
@@ -87,9 +88,9 @@ The L<n-gram|http://en.wikipedia.org/wiki/N-gram> fingerprint method is similar 
 Algorithm steps:
 
 =for :list
-* remove all punctuation, whitespace, and control characters (using C</[\W_]/> regexp)
 * normalize extended western characters to their ASCII representation
 * change all characters to their lowercase representation
+* remove all punctuation, whitespace, and control characters (using C</[\W_]/> regexp)
 * obtain all the string n-grams
 * sort the n-grams and remove duplicates
 * join the sorted n-grams back together
@@ -99,12 +100,13 @@ Algorithm steps:
 sub fingerprint_ngram ($;$) {
     my ($string, $n) = (@_, 2);
 
+    $string = lc unidecode $string;
     $string =~ s{ $NON_WORD }{}gosx;
 
     return join '' =>
         sort(
             uniq(
-                lc(unidecode($string)) =~ m{
+                $string =~ m{
                     (?=
                         (.{$n})
                     )
